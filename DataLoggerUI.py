@@ -1,0 +1,132 @@
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file 'DataLogger.ui'
+#
+# Created by: PyQt5 UI code generator 5.10.1
+#
+# WARNING! All changes made in this file will be lost!
+
+from PyQt5 import QtCore, QtGui, QtWidgets
+from DataLogger_backend import *
+
+class Ui_DataLoggerMainWindow(object):
+    def setupUi(self, DataLoggerMainWindow):
+        DataLoggerMainWindow.setObjectName("DataLoggerMainWindow")
+        DataLoggerMainWindow.resize(1138, 732)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(DataLoggerMainWindow.sizePolicy().hasHeightForWidth())
+        DataLoggerMainWindow.setSizePolicy(sizePolicy)
+        DataLoggerMainWindow.setToolButtonStyle(QtCore.Qt.ToolButtonIconOnly)
+        self.centralwidget = QtWidgets.QWidget(DataLoggerMainWindow)
+        self.centralwidget.setObjectName("centralwidget")
+        self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.centralwidget)
+        self.verticalLayout_3.setObjectName("verticalLayout_3")
+        # self.mpl_plot = QtWidgets.QWidget(self.centralwidget)
+        self.mpl_plot = DynamicMplCanvas(parent=self)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.mpl_plot.sizePolicy().hasHeightForWidth())
+        self.mpl_plot.setSizePolicy(sizePolicy)
+        self.mpl_plot.setObjectName("mpl_plot")
+        self.verticalLayout_3.addWidget(self.mpl_plot)
+        self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+
+        self.SampleRateLabel = QtWidgets.QLabel(self.centralwidget)
+        self.SampleRateLabel.setObjectName("SampleRateLabel")
+        self.horizontalLayout_2.addWidget(self.SampleRateLabel)
+        # self.SampleRateSpinbox = QtWidgets.QSpinBox(self.centralwidget)
+        # self.SampleRateSpinbox.setMinimum(1)
+        # self.SampleRateSpinbox.setMaximum(8000)
+        # self.SampleRateSpinbox.setSingleStep(250)
+        # self.SampleRateSpinbox.setProperty("value", 8000)
+        # self.SampleRateSpinbox.setObjectName("SampleRateSpinbox")
+        # self.horizontalLayout_2.addWidget(self.SampleRateSpinbox)
+
+        self.SampleRateCombo = QtWidgets.QComboBox(self.centralwidget)
+        self.SampleRateCombo.setObjectName("SampleRateCombo")
+        self.SampleRateCombo.addItems(["{0:.3f}".format(16e3/(16*13)), "{0:.3f}".format(16e3/(32*13)), "{0:.3f}".format(16e3/(64*13)), "{0:.3f}".format(16e3/(128*13))])
+        self.horizontalLayout_2.addWidget(self.SampleRateCombo)
+
+        
+        self.windowSizeLabel = QtWidgets.QLabel(self.centralwidget)
+        self.windowSizeLabel.setObjectName("windowSizeLabel")
+        self.horizontalLayout_2.addWidget(self.windowSizeLabel)
+        self.windowSizeSpinbox = QtWidgets.QSpinBox(self.centralwidget)
+        self.windowSizeSpinbox.setMinimum(1)
+        self.windowSizeSpinbox.setMaximum(9)
+        self.windowSizeSpinbox.setProperty('value', 6)
+        self.windowSizeSpinbox.setObjectName("windowSizeSpinbox")
+        self.horizontalLayout_2.addWidget(self.windowSizeSpinbox)
+        self.windowSizeMultiLabel = QtWidgets.QLabel(self.centralwidget)
+        self.windowSizeMultiLabel.setObjectName("windowSizeMultiLabel")
+        self.horizontalLayout_2.addWidget(self.windowSizeMultiLabel)
+        self.windowSizeMultiSpinbox = QtWidgets.QSpinBox(self.centralwidget)
+        self.windowSizeMultiSpinbox.setMinimum(-5)
+        self.windowSizeMultiSpinbox.setMaximum(1)
+        self.windowSizeMultiSpinbox.setProperty('value', 1)
+        self.windowSizeMultiSpinbox.setObjectName('windowSizeMultiSpinbox')
+        self.horizontalLayout_2.addWidget(self.windowSizeMultiSpinbox)
+
+        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_2.addItem(spacerItem)
+        self.verticalLayout_3.addLayout(self.horizontalLayout_2)
+        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.startButton = QtWidgets.QPushButton(self.centralwidget)
+        self.startButton.setObjectName("startButton")
+        self.horizontalLayout.addWidget(self.startButton)
+        
+        self.refreshButton = QtWidgets.QPushButton(self.centralwidget)
+        self.refreshButton.setObjectName("refreshButton")
+        self.horizontalLayout.addWidget(self.refreshButton)
+        
+        self.stopButton = QtWidgets.QPushButton(self.centralwidget)
+        self.stopButton.setObjectName("stopButton")
+        self.horizontalLayout.addWidget(self.stopButton)
+        self.saveButton = QtWidgets.QPushButton(self.centralwidget)
+        self.saveButton.setObjectName("saveButton")
+        self.horizontalLayout.addWidget(self.saveButton)
+        self.arduinosCombo = QtWidgets.QComboBox(self.centralwidget)
+        self.arduinosCombo.setObjectName("arduinosCombo")
+        self.horizontalLayout.addWidget(self.arduinosCombo)
+        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout.addItem(spacerItem1)
+        self.verticalLayout_3.addLayout(self.horizontalLayout)
+        DataLoggerMainWindow.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(DataLoggerMainWindow)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1138, 22))
+        self.menubar.setObjectName("menubar")
+        self.menuDatalogger = QtWidgets.QMenu(self.menubar)
+        self.menuDatalogger.setObjectName("menuDatalogger")
+        DataLoggerMainWindow.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(DataLoggerMainWindow)
+        self.statusbar.setObjectName("statusbar")
+        DataLoggerMainWindow.setStatusBar(self.statusbar)
+        self.menubar.addAction(self.menuDatalogger.menuAction())
+
+        self.retranslateUi(DataLoggerMainWindow)
+        self.startButton.clicked.connect(self.start)
+        self.refreshButton.clicked.connect(self.refresh)
+        self.stopButton.clicked.connect(self.stop)
+        self.saveButton.clicked.connect(self.save)
+        self.windowSizeSpinbox.valueChanged.connect(self.delta_update)
+        self.windowSizeMultiSpinbox.valueChanged.connect(self.deltamulti_update)
+        self.SampleRateCombo.currentIndexChanged.connect(self.sample_rate_change)
+        QtCore.QMetaObject.connectSlotsByName(DataLoggerMainWindow)
+
+    def retranslateUi(self, DataLoggerMainWindow):
+        _translate = QtCore.QCoreApplication.translate
+        DataLoggerMainWindow.setWindowTitle(_translate("DataLoggerMainWindow", "MainWindow"))
+        self.SampleRateLabel.setText(_translate("DataLoggerMainWindow", "kSamples/Second"))
+        self.startButton.setText(_translate("DataLoggerMainWindow", "Start"))
+        self.refreshButton.setText(_translate("DataLoggerMainWindow", "Refresh"))
+        self.stopButton.setText(_translate("DataLoggerMainWindow", "Stop"))
+        self.saveButton.setText(_translate("DataLoggerMainWindow", "Save"))
+        self.windowSizeLabel.setText(_translate("DataLoggerMainWindow", "Window Size [s]"))
+        self.windowSizeMultiLabel.setText(_translate('DataLoggerMainWindow', 'Size Multiplier 10^*'))
+        self.menuDatalogger.setTitle(_translate("DataLoggerMainWindow", "Datalogger"))
+
