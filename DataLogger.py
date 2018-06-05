@@ -85,7 +85,7 @@ class DataLogger(QtWidgets.QMainWindow, Ui_DataLoggerMainWindow):
         self.mpl_plot.update_figure()
 
     def find_arduino(self):
-        arduino_ports = [p for p in list_ports.comports() if ('USB UART' in p.description or 'Arduino' in p.description)]
+        arduino_ports = [p for p in list_ports.comports() if ('USB UART' in p.description or 'Arduino' in p.description or 'COM' in p.description)]
         return arduino_ports
     
     def  start(self):
