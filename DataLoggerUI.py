@@ -23,7 +23,6 @@ class Ui_DataLoggerMainWindow(object):
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
-        # self.mpl_plot = QtWidgets.QWidget(self.centralwidget)
         self.mpl_plot = DynamicMplCanvas(parent=self)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
@@ -35,44 +34,96 @@ class Ui_DataLoggerMainWindow(object):
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
 
+        self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
+
         self.SampleRateLabel = QtWidgets.QLabel(self.centralwidget)
         self.SampleRateLabel.setObjectName("SampleRateLabel")
-        self.horizontalLayout_2.addWidget(self.SampleRateLabel)
-        # self.SampleRateSpinbox = QtWidgets.QSpinBox(self.centralwidget)
-        # self.SampleRateSpinbox.setMinimum(1)
-        # self.SampleRateSpinbox.setMaximum(8000)
-        # self.SampleRateSpinbox.setSingleStep(250)
-        # self.SampleRateSpinbox.setProperty("value", 8000)
-        # self.SampleRateSpinbox.setObjectName("SampleRateSpinbox")
-        # self.horizontalLayout_2.addWidget(self.SampleRateSpinbox)
+        self.horizontalLayout_3.addWidget(self.SampleRateLabel)
+
+        self.lpFilterLabel = QtWidgets.QLabel(self.centralwidget)
+        self.lpFilterLabel.setObjectName("lpFilterLabel")
+        self.lpFilterCheckbox = QtWidgets.QCheckBox(self.centralwidget)
 
         self.SampleRateCombo = QtWidgets.QComboBox(self.centralwidget)
         self.SampleRateCombo.setObjectName("SampleRateCombo")
-        self.SampleRateCombo.addItems(["{0:.3f}".format(16e3/(16*13)), "{0:.3f}".format(16e3/(32*13)), "{0:.3f}".format(16e3/(64*13)), "{0:.3f}".format(16e3/(128*13))])
-        self.horizontalLayout_2.addWidget(self.SampleRateCombo)
+        self.SampleRateCombo.addItems([
+            "{0}".format(1), 
+            "{0}".format(2),
+            "{0}".format(4),
+            "{0}".format(5),
+            "{0}".format(10),
+            "{0}".format(25),
+            "{0}".format(40),
+            "{0}".format(80),
+            "{0}".format(100),
+            "{0}".format(125),
+            "{0}".format(200),
+            "{0}".format(250),
+            "{0}".format(500),
+            "{0}".format(625),
+            "{0}".format(1000),
+            "{0}".format(2500),
+            "{0}".format(3125),
+            "{0}".format(5000),
+            "{0}".format(6250),
+            "{0}".format(10000),
+            "{0}".format(12500),
+            "{0}".format(25000),
+            "{0}".format(31250),
+            "{0}".format(62500),
+            ])
+        self.horizontalLayout_3.addWidget(self.SampleRateCombo)
+        self.horizontalLayout_3.addWidget(self.lpFilterLabel)
+        self.horizontalLayout_3.addWidget(self.lpFilterCheckbox)
 
         
-        self.windowSizeLabel = QtWidgets.QLabel(self.centralwidget)
-        self.windowSizeLabel.setObjectName("windowSizeLabel")
-        self.horizontalLayout_2.addWidget(self.windowSizeLabel)
-        self.windowSizeSpinbox = QtWidgets.QSpinBox(self.centralwidget)
-        self.windowSizeSpinbox.setMinimum(1)
-        self.windowSizeSpinbox.setMaximum(9)
-        self.windowSizeSpinbox.setProperty('value', 6)
-        self.windowSizeSpinbox.setObjectName("windowSizeSpinbox")
-        self.horizontalLayout_2.addWidget(self.windowSizeSpinbox)
-        self.windowSizeMultiLabel = QtWidgets.QLabel(self.centralwidget)
-        self.windowSizeMultiLabel.setObjectName("windowSizeMultiLabel")
-        self.horizontalLayout_2.addWidget(self.windowSizeMultiLabel)
-        self.windowSizeMultiSpinbox = QtWidgets.QSpinBox(self.centralwidget)
-        self.windowSizeMultiSpinbox.setMinimum(-5)
-        self.windowSizeMultiSpinbox.setMaximum(1)
-        self.windowSizeMultiSpinbox.setProperty('value', 1)
-        self.windowSizeMultiSpinbox.setObjectName('windowSizeMultiSpinbox')
-        self.horizontalLayout_2.addWidget(self.windowSizeMultiSpinbox)
+        self.timeSizeLabel = QtWidgets.QLabel(self.centralwidget)
+        self.timeSizeLabel.setObjectName("timeSizeLabel")
+        self.horizontalLayout_2.addWidget(self.timeSizeLabel)
+        self.timeSizeSpinbox = QtWidgets.QSpinBox(self.centralwidget)
+        self.timeSizeSpinbox.setMinimum(1)
+        self.timeSizeSpinbox.setMaximum(9)
+        self.timeSizeSpinbox.setProperty('value', 6)
+        self.timeSizeSpinbox.setObjectName("timeSizeSpinbox")
+        self.horizontalLayout_2.addWidget(self.timeSizeSpinbox)
+        self.timeSizeMultiLabel = QtWidgets.QLabel(self.centralwidget)
+        self.timeSizeMultiLabel.setObjectName("timeSizeMultiLabel")
+        self.horizontalLayout_2.addWidget(self.timeSizeMultiLabel)
+        self.timeSizeMultiSpinbox = QtWidgets.QSpinBox(self.centralwidget)
+        self.timeSizeMultiSpinbox.setMinimum(-5)
+        self.timeSizeMultiSpinbox.setMaximum(2)
+        self.timeSizeMultiSpinbox.setProperty('value', 1)
+        self.timeSizeMultiSpinbox.setObjectName('timeSizeMultiSpinbox')
+        self.horizontalLayout_2.addWidget(self.timeSizeMultiSpinbox)
+
+        self.voltageSizeLabel = QtWidgets.QLabel(self.centralwidget)
+        self.voltageSizeLabel.setObjectName("voltageSizeLabel")
+        self.horizontalLayout_2.addWidget(self.voltageSizeLabel)
+        self.voltageSizeSpinbox = QtWidgets.QSpinBox(self.centralwidget)
+        self.voltageSizeSpinbox.setMinimum(1)
+        self.voltageSizeSpinbox.setMaximum(10)
+        self.voltageSizeSpinbox.setProperty('value', 10)
+        self.voltageSizeSpinbox.setObjectName("voltageSizeSpinbox")
+        self.horizontalLayout_2.addWidget(self.voltageSizeSpinbox)
+        self.voltageSizeMultiLabel = QtWidgets.QLabel(self.centralwidget)
+
+        self.voltageOffsetLabel = QtWidgets.QLabel(self.centralwidget)
+        self.voltageOffsetLabel.setObjectName("voltageOffsetLabel")
+        self.horizontalLayout_2.addWidget(self.voltageOffsetLabel)
+        self.voltageOffsetSpinbox = QtWidgets.QDoubleSpinBox(self.centralwidget)
+        self.voltageOffsetSpinbox.setMinimum(0)
+        self.voltageOffsetSpinbox.setMaximum(10)
+        self.voltageOffsetSpinbox.setDecimals(1)
+        self.voltageOffsetSpinbox.setSingleStep(0.2)
+        self.voltageOffsetSpinbox.setProperty('value', 0)
+        self.voltageOffsetSpinbox.setObjectName("voltageOffsetSpinbox")
+        self.horizontalLayout_2.addWidget(self.voltageOffsetSpinbox)
 
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_3.addItem(spacerItem)
         self.horizontalLayout_2.addItem(spacerItem)
+        self.verticalLayout_3.addLayout(self.horizontalLayout_3)
         self.verticalLayout_3.addLayout(self.horizontalLayout_2)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -93,6 +144,14 @@ class Ui_DataLoggerMainWindow(object):
         self.arduinosCombo = QtWidgets.QComboBox(self.centralwidget)
         self.arduinosCombo.setObjectName("arduinosCombo")
         self.horizontalLayout.addWidget(self.arduinosCombo)
+
+        self.saveSettingsButton = QtWidgets.QPushButton(self.centralwidget)
+        self.saveSettingsButton.setObjectName("saveSettingsButton")
+        self.horizontalLayout.addWidget(self.saveSettingsButton)
+        self.loadSettingsButton = QtWidgets.QPushButton(self.centralwidget)
+        self.loadSettingsButton.setObjectName("loadSettingsButton")
+        self.horizontalLayout.addWidget(self.loadSettingsButton)
+
         spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem1)
         self.verticalLayout_3.addLayout(self.horizontalLayout)
@@ -113,20 +172,31 @@ class Ui_DataLoggerMainWindow(object):
         self.refreshButton.clicked.connect(self.refresh)
         self.stopButton.clicked.connect(self.stop)
         self.saveButton.clicked.connect(self.save)
-        self.windowSizeSpinbox.valueChanged.connect(self.delta_update)
-        self.windowSizeMultiSpinbox.valueChanged.connect(self.deltamulti_update)
+        self.timeSizeSpinbox.valueChanged.connect(self.delta_update)
+        self.timeSizeMultiSpinbox.valueChanged.connect(self.deltamulti_update)
+        self.voltageSizeSpinbox.valueChanged.connect(self.voltage_update)
         self.SampleRateCombo.currentIndexChanged.connect(self.sample_rate_change)
+        self.lpFilterCheckbox.clicked.connect(self.toggle_lpfilter)
+        self.lpFilterCheckbox.stateChanged.connect(self.toggle_lpfilter)
+        self.saveSettingsButton.clicked.connect(self.save_settings)
+        self.loadSettingsButton.clicked.connect(self.load_user_settings)
+        self.voltageOffsetSpinbox.valueChanged.connect(self.voltage_offset_update)
         QtCore.QMetaObject.connectSlotsByName(DataLoggerMainWindow)
 
     def retranslateUi(self, DataLoggerMainWindow):
         _translate = QtCore.QCoreApplication.translate
         DataLoggerMainWindow.setWindowTitle(_translate("DataLoggerMainWindow", "MainWindow"))
-        self.SampleRateLabel.setText(_translate("DataLoggerMainWindow", "kSamples/Second"))
+        self.SampleRateLabel.setText(_translate("DataLoggerMainWindow", "Samples/Second"))
         self.startButton.setText(_translate("DataLoggerMainWindow", "Start"))
         self.refreshButton.setText(_translate("DataLoggerMainWindow", "Refresh"))
         self.stopButton.setText(_translate("DataLoggerMainWindow", "Stop"))
-        self.saveButton.setText(_translate("DataLoggerMainWindow", "Save"))
-        self.windowSizeLabel.setText(_translate("DataLoggerMainWindow", "Window Size [s]"))
-        self.windowSizeMultiLabel.setText(_translate('DataLoggerMainWindow', 'Size Multiplier 10^*'))
+        self.saveButton.setText(_translate("DataLoggerMainWindow", "Save Data"))
+        self.timeSizeLabel.setText(_translate("DataLoggerMainWindow", "Time Axis [s]"))
+        self.timeSizeMultiLabel.setText(_translate('DataLoggerMainWindow', 'x 10^'))
+        self.voltageSizeLabel.setText(_translate("DataLoggerMainWindow", "Voltage Axis [V]"))
+        self.lpFilterLabel.setText(_translate("DataLoggerMainWindow", "Low Pass Filter:"))
+        self.loadSettingsButton.setText(_translate('DataLoggerMainWindow', 'Load Settings'))
+        self.saveSettingsButton.setText(_translate('DataLoggerMainWindow', "Save Current Settings"))
+        self.voltageOffsetLabel.setText(_translate('DataLoggerMainWindow', "Voltage DC Offset [V]"))
         self.menuDatalogger.setTitle(_translate("DataLoggerMainWindow", "Datalogger"))
 

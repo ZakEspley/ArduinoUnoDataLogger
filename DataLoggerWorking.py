@@ -20,21 +20,29 @@ class DataLogger(QtWidgets.QMainWindow, Ui_DataLoggerMainWindow):
         self.config = configparser.ConfigParser()
         self.config.read('settings.ini')
 
+        self.ylim = int(self.config['Default']['y_lim'])
+        self.voltage_reference = float(self.config['Default']['voltage_reference'])
+        self.delta_base = int(self.config["Default"]['delta_base'])
+        self.delta_multiplyer = int(self.config['Default']['delta_multiplyer'])
+        self.delta = self.delta_base * 10**self.delta_multiplyer
 
         self.sample_rates = [(4).to_bytes(1, "big"), (5).to_bytes(1, "big"), (6).to_bytes(1, "big"), (7).to_bytes(1, "big")]
         self.adc_prescalars = [16, 32, 64, 128]
         self.rate = 8000
 
-
+        self.setupUi(self)
+        self.mpl_plot.compute_initial_figure()
 
         self.state = False
         self.lp_state = 0
 
         self.arduino_list = self.find_arduino()
         self.arduino = serial.Serial(port=self.arduino_list[0].device, baudrate=2000000)
-
+        self.mpl_plot.arduino = self.arduino
+        self.arduinosCombo.addItems([d.description for d in self.arduino_list])
 
         self.timer = QtCore.QTimer(self)
+        self.timer.timeout.connect(self.mpl_plot.update_figure)
 
 
         self.savefile = ""
@@ -51,7 +59,7 @@ class DataLogger(QtWidgets.QMainWindow, Ui_DataLoggerMainWindow):
         self.line = None
         self.BUF_SIZE = 6
         self.raw_data = b''
-
+        # self.proportion = 10/1024
 
         self.filter_buffer = deque(maxlen=20000)
         self.filter_buffer.append(0)
@@ -61,6 +69,7 @@ class DataLogger(QtWidgets.QMainWindow, Ui_DataLoggerMainWindow):
         self.packet_length = deque(maxlen=10000)
         self.filter_z = 0
         
+        self.proportion = self.voltage_reference/256
         self.adc_prescalar = 16
         self.timer_prescaler = 64
         self.timer_top = 6249
@@ -72,23 +81,57 @@ class DataLogger(QtWidgets.QMainWindow, Ui_DataLoggerMainWindow):
                         15625: (64, ((3).to_bytes(1, 'big'))),   ### This is equivilent to  64 prescaler in Arduino TCCR1B Register
                         125000: (8, ((2).to_bytes(1, 'big')))    ### This is equivilent to   8 prescaler in Arduino TCCR1B Register
             }
-        self.sample_rate_indexes = [1, 2, 4, 5, 10, 25, 40, 80, 100, 125, 200, 250, 500, 625, 1000, 2500, 3125, 5000, 6250, 10000, 12500, 25000, 31250, 62500]
+        self.sample_rate_indexes = [1, 2, 4, 5, 10, 25, 40, 80, 100, 125, 200, 250, 500, 625, 1000, 2500, 3125, 5000, 6250, 10000, 12500, 25000, 31250, 62500, 125000]
+        # self.setupUi(self)
+        
+        # self.sample_rate_change(int(self.config["DataLogger"]['sample_rate']))
+        # self.voltage_update(self.ylim)
+        self.arduino.write(b'99')
+        time.sleep(5)
+        self.SampleRateCombo.setCurrentIndex(int(self.config["Default"]['sample_rate']))
+        time.sleep(0.2)
+        # self.SampleRateCombo.setCurrentIndex(7)
+        time.sleep(0.2)
+        # self.SampleRateCombo.setCurrentIndex(int(self.config["Default"]["sample_rate"]))
+        self.voltageSizeSpinbox.setValue(self.ylim)
+        time.sleep(0.2)
+        self.timeSizeSpinbox.setValue(self.delta_base)
+        time.sleep(0.2)
+        self.timeSizeMultiSpinbox.setValue(self.delta_multiplyer)
+        time.sleep(0.2)
+        self.lpFilterCheckbox.setChecked(self.config['Default'].getboolean('lp_filter_status'))
 
-        self.setupUi(self)
-        self.mpl_plot.compute_initial_figure()
-        self.mpl_plot.arduino = self.arduino
-        self.arduinosCombo.addItems([d.description for d in self.arduino_list])
-        self.timer.timeout.connect(self.mpl_plot.update_figure)
+        self.DEBUG_INT = 0
+        print(self.adc_prescalar)
+        # print(config)
+        # print()
+        # print()
+        # print(config["DataLogger"]['sample_rate'])
+       
+       
 
-        time.sleep(2)
-        self.load_default_settings()
-        self.mpl_plot.update_figure()
-
+        
+    
     def find_arduino(self):
         arduino_ports = [p for p in list_ports.comports() if ('USB UART' in p.description or 'Arduino' in p.description)]
         return arduino_ports
     
     def  start(self):
+        # if self.t0 == 0:
+        #     self.t0 = time.time()
+        # self.arduino.write(b"3")
+        # self.rate = self.SampleRateSpinbox.value()
+        # b1 = int(np.floor(self.rate/256))
+        # b2 = self.rate%256
+        # print(self.rate)
+        # print(b1,b2)
+        # self.arduino.write(struct.pack("B", b1))
+        # time.sleep(0.1)
+        # self.arduino.write(struct.pack("B", b2))
+        # time.sleep(0.2)
+
+        # print(self.arduino.read(size=self.arduino.in_waiting))
+        # self.datacollector.start()
         if not self.state:
             self.startButton.setText(QtCore.QCoreApplication.translate("DataLoggerMainWindow", 'Pause'))
             self.state = True
@@ -103,39 +146,26 @@ class DataLogger(QtWidgets.QMainWindow, Ui_DataLoggerMainWindow):
         self.startButton.setText(QtCore.QCoreApplication.translate("DataLoggerMainWindow",'Start'))
         self.timer.stop()
         self.datacollector.quit()
+        print("FILTERED DATA:", len(self.ydata))
         self.arduino.write(b'6')
         time.sleep(0.1)
     
     def save(self, *args):
-        self.savefile, _ = QtWidgets.QFileDialog.getSaveFileName(filter="*.csv")
-        if self.savefile != '':
-            np.savetxt(self.savefile, self.results, fmt="%1.8f", delimiter=",")
+        self.savefile = QtWidgets.QFileDialog.getSaveFileName(filter="*.csv")
+        np.savetxt(self.savefile[0], self.results, fmt="%1.8f", delimiter=",")
     
     def refresh(self, *args):
-        current_state = self.state
-        if self.state:
-            self.stop()
         self.ydata = deque(maxlen=self.queue_length)
         self.xdata = deque(maxlen=self.queue_length)
         self.ydata.append(0)
         self.xdata.append(0)
-        self.time_buffer = deque(maxlen=1001)
-        self.filter_buffer = deque(maxlen=1001)
-        self.time_buffer.clear()
-        self.filter_buffer.clear()
-        self.time_buffer.append(0)
-        self.filter_buffer.append(0)
         self.results = []
         self.raw_data = b''
         self.j = 0
-        self.arduino.write(b'7')
-        self.mpl_plot.update_figure()
         self.mpl_plot.ax.cla()
         self.mpl_plot.ax.set_xlim(-self.delta, 0)
         self.mpl_plot.ax.grid(color='gray', linestyle='--')
         self.mpl_plot.draw()
-        if current_state:
-            self.start()
 
     def delta_update(self, i):
         self.delta = i*10**self.timeSizeMultiSpinbox.value()
@@ -171,6 +201,8 @@ class DataLogger(QtWidgets.QMainWindow, Ui_DataLoggerMainWindow):
             self.arduino.write(b'6')
             self.sample_rate = self.sample_rate_indexes[index]
 
+            # self.adc_prescalar = self.adc_prescalars[index]
+            # print(self.adc_prescalar)
             for freq in self.sample_dict:
                 if self.sample_rate <= freq:
                     self.timer_prescaler = self.sample_dict[freq][0]
@@ -178,16 +210,37 @@ class DataLogger(QtWidgets.QMainWindow, Ui_DataLoggerMainWindow):
                     break
             
             self.timer_top = int(16e6/(self.timer_prescaler*self.sample_rate)-1)
+            print(self.timer_top)
             timer_top_bytes = ((self.timer_top).to_bytes(2, "big"))
+            print("SAMPLE RATE CHANGE!")
             current_state = self.state
             if self.state:
                 self.stop()
             self.arduino.write(b'3')
+            # time.sleep(1)
             self.arduino.write(prescaler_byte)
+            # time.sleep(1)
             self.arduino.write(timer_top_bytes)
             time.sleep(1.1)
-            self.BUF_SIZE = min(max(8, int(self.sample_rate/8)), 1000)
+            # while self.arduino.in_waiting == 0:
+            #     print("Waiting...")
+            #     time.sleep(1)
+            # print("PRESCALER:", self.timer_prescaler)
+            # print(self.arduino.in_waiting)
+            # print("SENDSIZE=", self.arduino.read(self.arduino.in_waiting))
 
+            # print(self.arduino.read(1))
+            # while self.arduino.in_waiting < 2:
+            #     print("Received... " + str(self.arduino.in_waiting)+ " bytes")
+            #     time.sleep(1)
+            # bt = self.arduino.read(size=2)
+            # print("BYTES:")
+            # print(bt)
+            # print(bt[0]*256+bt[1])
+            # print(self.arduino.read(2))
+            self.BUF_SIZE = min(max(8, int(self.sample_rate/8)), 1000)
+            print("BUF_SIZE = ", self.BUF_SIZE)
+            print("SampleRate = ", self.sample_rate)
             if self.sample_rate > 10:
                 self.butter_b, self.butter_a = butter(4, 10/self.sample_rate)
 
@@ -197,13 +250,7 @@ class DataLogger(QtWidgets.QMainWindow, Ui_DataLoggerMainWindow):
     def voltage_update(self, voltage):
         self.ylim = voltage
         if not self.state:
-            self.mpl_plot.ax.set_ylim(0+self.voltage_offset, self.ylim+self.voltage_offset)
-            self.mpl_plot.draw()
-    
-    def voltage_offset_update(self, offset):
-        self.voltage_offset = offset
-        if not self.state:
-            self.mpl_plot.ax.set_ylim(0+self.voltage_offset, self.ylim+self.voltage_offset)
+            self.mpl_plot.ax.set_ylim(0, self.ylim)
             self.mpl_plot.draw()
     
     def toggle_lpfilter(self, lp_state):
@@ -214,29 +261,38 @@ class DataLogger(QtWidgets.QMainWindow, Ui_DataLoggerMainWindow):
             warn.show()
             self.lpFilterCheckbox.setChecked(False)
         else:
+            print("FILTER TOGGLED")
             current_state = self.state
+
+            print(lp_state)
             self.butter_b, self.butter_a = butter(4, 10/self.sample_rate)
             if lp_state == 2:
                 self.lp_state = 1
             else:
                 self.lp_state = lp_state
             
+
+            if self.state:
+                self.stop()
+
+            # if self.lp_state:
+            #     warn = QtWidgets.QMessageBox(self.centralwidget)
+            #     warn.setText("Warning: Using the Lowpass Filter will reduce sample rate by ~60x.")
+            #     warn.setIcon(QtWidgets.QMessageBox.Warning)
+            #     warn.show()
+            
+            # self.arduino.write(b'4')
+            # self.arduino.write((self.lp_state).to_bytes(1, "big"))
+            # if self.lp_state:
+            #     self.arduino.write(b'1')
+            # else:
+            #     self.arduino.write(b'0')
+
+            if current_state:
+                self.start()
     
     def  save_settings(self):
-        
-        user_settings = self.config["UserSettings"]
-
-        user_settings['y_lim'] = str(self.ylim)
-        user_settings['delta_base'] = str(self.delta_base)
-        user_settings['delta_multiplyer'] = str(self.delta_multiplyer)
-        user_settings['voltage_reference'] = str(self.voltage_reference)
-        user_settings['sample_rate'] = str(self.sample_rate_indexes.index(self.sample_rate))
-        user_settings['lp_filter_status'] = str(True if self.lp_state else False)
-        user_settings['voltage_offset'] = str(self.voltage_offset)
-
-        with open('settings.ini', 'w') as f:
-            self.config.write(f)
-        
+        pass
     
     def __load_settings(self, settings_name):
 
@@ -245,15 +301,14 @@ class DataLogger(QtWidgets.QMainWindow, Ui_DataLoggerMainWindow):
         self.delta_base = int(self.config[settings_name]['delta_base'])
         self.delta_multiplyer = int(self.config[settings_name]['delta_multiplyer'])
         self.delta = self.delta_base * 10**self.delta_multiplyer
-        self.voltage_offset = float(self.config[settings_name]['voltage_offset'])
 
         self.proportion = self.voltage_reference/256
 
-        self.SampleRateCombo.setCurrentIndex(int(self.config[settings_name]['sample_rate']))
+        self.SampleRateCombo.setCurrentIndex(int(self.config["Default"]['sample_rate']))
         self.voltageSizeSpinbox.setValue(self.ylim)
         self.timeSizeSpinbox.setValue(self.delta_base)
         self.timeSizeMultiSpinbox.setValue(self.delta_multiplyer)
-        self.lpFilterCheckbox.setChecked(self.config[settings_name].getboolean('lp_filter_status'))
+        self.lpFilterCheckbox.setChecked(self.config['Default'].getboolean('lp_filter_status'))
 
 
     def load_user_settings(self):
