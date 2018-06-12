@@ -1,6 +1,6 @@
 # Data Logger for the Arduino Uno R3
 
-![Screen Shot of App](https://github.com/ZakEspley/ArduinoUnoDataLogger/blob/master/DataLoggerScreenShot.png?raw=true "3.75kHz")
+![Screen Shot of App](https://github.com/ZakEspley/ArduinoUnoDataLogger/blob/master/DataLoggerScreenShot2.png?raw=true "3.75kHz")
 
 This has only been tested on the Arduino R3 but you could try it on a different Arduino, just change the code and commands to match the USB Controller (AtMega16U2) on your Arduino.
 
